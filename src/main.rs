@@ -14,4 +14,7 @@ struct Args {
 fn main() {
     let args = Args::parse();
     println!("{:?}", args)
+    // Read the file line by line
+    // Use each line to determine the block kind
+    // Once you have the block structure, go tag-by-tag and do inlines?
 }
