@@ -1,0 +1,63 @@
+= An Example Document
+
+This is a paragraph with no inlines.
+
+This is a paragraph with _italic_, *bold*, and `code` text.
+
+[role="test"]
+This is a paragraph with a role, "test."
+
+== This is a second-level heading
+
+This is more text, introducing a list:
+
+* Item
+* Item
+* Item
+
+And now an ordered list:
+
+. One
+. Two
+. Three
+
+And, finally, a definition list:
+
+Some:: Thing
+
+Another:: Thing
+
+Finally:: 
++
+--
+A definition list with an open block.
+--
+
+.Title
+****
+This is an aside!
+
+It has two component paragraphs.
+****
+
+But for now a quote:
+
+[quote, Some Smart Person, Where it Was]
+Fee, fie, foe, fum.
+
+And now with alternate syntax:
+
+[quote, Some Smart Person, Where it Was]
+____
+Fee, fie, foe, fum.
+____
+
+Last, how about some verse?
+
+[verse]
+____
+A rose would not smell as sweet
+Were it not really a rose, no?
+____
+
+Finally, here is a paragraph with a footnote.footnote:[See? Footnote.]
