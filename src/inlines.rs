@@ -18,11 +18,3 @@ pub fn get_class_from_role(line: &str) -> Option<String> {
         None => None,
     }
 }
-
-pub fn parse_inline(
-    line: String,
-    parser_inline: Option<Vec<Inlines>>,
-) -> (String, Option<Vec<Inlines>>) {
-    todo!();
-    return (line, None);
-}
