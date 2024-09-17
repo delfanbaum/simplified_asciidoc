@@ -12,8 +12,14 @@ pub struct Parser {
     parsed_markup: String,
 }
 
+impl Default for Parser {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Parser {
-    fn new() -> Parser {
+    pub fn new() -> Parser {
         Parser {
             current_parent_block: None,
             current_block: None,
@@ -24,7 +30,7 @@ impl Parser {
         }
     }
 
-    fn parse_line(&mut self, line: &str) {
+    pub fn parse_line(&mut self, line: &str) {
         let splits: Vec<&str> = line.split_whitespace().collect();
 
         // Checks to see if the line is just block syntax markup
@@ -35,8 +41,8 @@ impl Parser {
                     '[' => match &splits[0][..5] {
                         "[quot" => self.current_parent_block = Some(ParentBlock::Quote),
                         "[vers" => self.current_parent_block = Some(ParentBlock::Verse),
-                        "[role" => self.current_class = get_class_from_role(&line),
-                        _ => println!("{}", splits[0][..4].to_string()),
+                        "[role" => self.current_class = get_class_from_role(line),
+                        _ => eprintln!("Unhandled block tag: {}", line),
                     },
                     _ => {
                         // if not in a paragraph already, make a paragraph
@@ -53,7 +59,7 @@ impl Parser {
         }
     }
 
-    fn is_block_syntax(&mut self, splits: &Vec<&str>) -> bool {
+    fn is_block_syntax(&mut self, splits: &[&str]) -> bool {
         if splits.is_empty() {
             // basically, clear
             // i.e., a "\n" string
@@ -61,7 +67,8 @@ impl Parser {
             self.current_block = None;
             self.current_inline = None;
             self.current_class = None;
-            // TODO call "close tag" function
+            // we may also need a close inline tags
+            self.close_tags();
             return true;
         } else if splits.len() == 1 {
             match splits[0] {
@@ -85,7 +92,7 @@ impl Parser {
         false
     }
 
-    fn is_inline_block_marker(&mut self, splits: &Vec<&str>) -> bool {
+    fn is_inline_block_marker(&mut self, splits: &[&str]) -> bool {
         match splits[0].chars().next().unwrap() {
             '=' => {
                 // use the length of the first split to get heading level
@@ -126,7 +133,7 @@ impl Parser {
         }
         if self.current_class.is_some() {
             tag = tag.replacen(
-                ">",
+                '>',
                 &format!(" class=\"{}\">", self.current_class.as_ref().unwrap()),
                 1,
             );
@@ -134,8 +141,21 @@ impl Parser {
         self.parsed_markup.push_str(&tag);
     }
 
-    fn close_block_tags(&mut self) {
+    fn close_tags(&mut self) {
         let mut tag = String::new();
+        match &self.current_inline {
+            Some(inlines) => {
+                for inline in inlines.iter() {
+                    if inline.tag().is_some() {
+                        tag.push_str(&format!(
+                            "</{}>",
+                            inline.tag().unwrap().split_whitespace().next().unwrap()
+                        ))
+                    }
+                }
+            }
+            None => (),
+        }
         if self.current_parent_block.is_some() {
             tag.push_str(&format!("</{}>", self.current_block.unwrap().tag()))
         }
@@ -163,7 +183,7 @@ impl Parser {
         self.parsed_markup.push_str(&html_fragment);
     }
 
-    fn parse_inline(&mut self, line: String) -> String {
+    fn parse_inline(&mut self, _line: String) -> String {
         // really this is "TODO" but we want the other test to pass
         "".to_string()
     }
