@@ -184,9 +184,9 @@ impl Parser {
         self.parsed_markup.push_str(&html_fragment);
     }
 
-    fn parse_inline(&mut self, _line: String) -> String {
+    fn parse_inline(&mut self, line: String) -> String {
         // really this is "TODO" but we want the other test to pass
-        "".to_string()
+        line
     }
 }
 
@@ -240,5 +240,42 @@ mod tests {
         let line = "[verse]";
         p.parse_line(line);
         assert_eq!(p.current_parent_block.unwrap(), ParentBlock::Verse);
+    }
+
+    #[test]
+    fn parse_inline_text() {
+        let mut p = Parser::new();
+        let line = "This is just a line of text. We have an incomplete".to_string();
+        assert_eq!(
+            "This is just a line of text. We have an incomplete".to_string(),
+            p.parse_inline(line)
+        )
+    }
+    #[test]
+    fn parse_inline_complete_tags() {
+        let mut p = Parser::new();
+        let line = "We have an _italic_ part in here".to_string();
+        assert_eq!(
+            "We have an <em>italic</em> part in here".to_string(),
+            p.parse_inline(line)
+        );
+
+        let line = "We have a *bold* part in here".to_string();
+        assert_eq!(
+            "We have a <strong>bold</strong> part in here".to_string(),
+            p.parse_inline(line)
+        );
+
+        let line = "We have a `code` part in here".to_string();
+        assert_eq!(
+            "We have a <code>code</code> part in here".to_string(),
+            p.parse_inline(line)
+        );
+
+        let line = "We have a footnote.footnote[Some text.]".to_string();
+        assert_eq!(
+            "We have a footnote.<span data-type=\"footnote\">Some text.</span>".to_string(),
+            p.parse_inline(line)
+        );
     }
 }
