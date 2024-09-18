@@ -39,6 +39,7 @@ impl Parser {
             if !self.is_inline_block_marker(&splits) {
                 match line.chars().next().unwrap() {
                     '[' => match &splits[0][..5] {
+                        // to do: attributions! attrs generally, actually
                         "[quot" => self.current_parent_block = Some(ParentBlock::Quote),
                         "[vers" => self.current_parent_block = Some(ParentBlock::Verse),
                         "[role" => self.current_class = get_class_from_role(line),
